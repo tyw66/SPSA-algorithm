@@ -7,6 +7,12 @@ Created on Tue Mar 21 22:19:11 2017
 import numpy as np
 from numpy  import random as rd
 
+import matplotlib.pyplot as plt
+
+from traits.api import HasTraits
+from traits.api import Int,Str,Float
+from traitsui.api import View,Item,OKCancelButtons
+
 
 def testFunc(x,n):
     res=0
@@ -76,10 +82,38 @@ def SPSA(x,func,n,iterNum,ALPHA=0.5,CK=0.02):
             
     return x_plus,obj_iter
     
+class myclass(HasTraits):
+    iterNum=Int(100)
+    pertNum=Int(5)
+    iterLen=Float(0.5)    
+    pertLen=Float(0.01)
+    func=Str(testFunc)
+    
+    View=View(
+        Item('iterNum',label=u"迭代次数",tooltip="进行多少次循环"),
+        Item('pertNum',label=u"扰动次数"),
+        Item('iterLen',label=u"迭代步长"),
+        Item('pertLen',label=u"扰动步长"),
+        Item('func',label=u"待求函数"),
+        title=u"优化参数设置",
+        width=400,
+        height=100,
+        resizable=True,  
+        buttons=OKCancelButtons
+    )
     
     
-if __name__=='__main__':
+    
+if __name__=='__main__':    
+    my=myclass()
+    my.configure_traits()    
     u=np.array([[23],[16],[37]])
-    u_opt,obj_iter=SPSA(u,testFunc,3,500,0.5,0.02)
 
+    u_opt,obj_iter=SPSA(u,my.func,3,my.iterNum,my.pertNum,my.pertLen)
+    fig_obj=plt.figure(figsize=(8,4))
+    
+    x=np.linspace(1,my.iterNum,my.iterNum)
+    plt.plot(x,obj_iter)
+    fig_obj.show()
+    
     
